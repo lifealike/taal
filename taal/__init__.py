@@ -13,6 +13,9 @@ from sqlalchemy.sql.expression import and_, or_, desc
 
 from taal import strategies
 from taal.exceptions import BindError
+# Backward compatible import
+from taal.translatablestring import (  # noqa
+    TranslatableString, is_translatable_value)
 
 try:
     VERSION = __import__('pkg_resources').get_distribution('taal').version
