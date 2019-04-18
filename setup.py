@@ -34,10 +34,10 @@ requirements, dependency_links = parse_requirments(
 setup(
     name='taal',
     packages=find_packages(exclude=['tests', 'tests.*']),
-    version='0.8.2',
+    version='0.8.2.post1+onefinestay.1',
     author='onefinestay',
     author_email='engineering@onefinestay.com',
-    url='https://github.com/onefinestay/taal',
+    url='https://github.com/lifealike/taal',
     install_requires=requirements,
     classifiers=[
         "Development Status :: 3 - Alpha",
