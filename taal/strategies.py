@@ -16,32 +16,41 @@ class Strategy(object):
         self.session = session
         return self
 
-    def translate(self, translatable):
+    def translate(self, translatable, cache=None):
+        if cache is None:
+            cache = self._prepare_cache(translatable)
+
         try:
-            return self.cache[
+            return cache[
                 (translatable.context, translatable.message_id, self.language)
             ]
         except KeyError:
-            return self.translation_missing(translatable)
+            return self.translation_missing(translatable, cache)
 
-    def translation_missing(self, translatable):
+    def translation_missing(self, translatable, cache):
         raise NotImplementedError
 
-    def recursive_translate(self, translatable):
-        self.cache = self._prepare_cache(translatable)
+    def recursive_translate(self, translatable, cache=None):
+        if cache is None:
+            cache = self._prepare_cache(translatable)
 
         if isinstance(translatable, TranslatableString):
-            return self.translate(translatable)
+            return self.translate(translatable, cache)
         elif isinstance(translatable, dict):
             return dict(
-                (key, self.recursive_translate(val))
+                (key, self.recursive_translate(val, cache))
                 for key, val in translatable.iteritems()
             )
         elif isinstance(translatable, list):
-            return [self.recursive_translate(item) for item in translatable]
+            return [
+                self.recursive_translate(item, cache)
+                for item in translatable
+            ]
         elif isinstance(translatable, tuple):
-            return tuple(self.recursive_translate(item)
-                         for item in translatable)
+            return tuple(
+                self.recursive_translate(item, cache)
+                for item in translatable
+            )
         else:
             return translatable
 
@@ -107,13 +116,13 @@ class Strategy(object):
 
 class NoneStrategy(Strategy):
 
-    def translation_missing(self, translatable):
+    def translation_missing(self, translatable, cache):
         return None
 
 
 class SentinelStrategy(Strategy):
 
-    def translation_missing(self, translatable):
+    def translation_missing(self, translatable, cache):
         return TRANSLATION_MISSING
 
 
@@ -124,7 +133,7 @@ class DebugStrategy(Strategy):
             self.language, translatable.context, translatable.message_id
         ).decode('utf-8')
 
-    def translation_missing(self, translatable):
+    def translation_missing(self, translatable, cache):
         return self.get_debug_translation(translatable)
 
 
@@ -133,9 +142,9 @@ class FallbackLangStrategy(Strategy):
     def __init__(self, fallback_lang):
         self.fallback_lang = fallback_lang
 
-    def translation_missing(self, translatable):
+    def translation_missing(self, translatable, cache):
         try:
-            return self.cache[(
+            return cache[(
                 translatable.context,
                 translatable.message_id,
                 self.fallback_lang,
