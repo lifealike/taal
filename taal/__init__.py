@@ -13,6 +13,9 @@ from sqlalchemy.sql.expression import and_, or_, desc
 
 from taal import strategies
 from taal.exceptions import BindError
+# Backward compatible import
+from taal.translatablestring import (  # noqa
+    TranslatableString, is_translatable_value)
 
 try:
     VERSION = __import__('pkg_resources').get_distribution('taal').version
@@ -92,10 +95,6 @@ class Translator(object):
         else:
             raise BindError("Unknown target {}".format(target))
 
-    def _get_debug_translation(self, translatable):
-        return u"[Translation missing ({}, {}, {})]".format(
-            self.language, translatable.context, translatable.message_id)
-
     def translate(self, translatable, strategy=None, cache=None):
         """
         Translate ``TranslatableString`` by looking up a translation
@@ -124,7 +123,7 @@ class Translator(object):
                     translatable, TRANSLATION_MISSING))
 
         if self.strategy == self.strategies.DEBUG_VALUE:
-            debug_value = self._get_debug_translation(translatable)
+            debug_value = self.strategy.get_debug_translation(translatable)
             if translatable.pending_value == debug_value:
                 return
 
