@@ -127,7 +127,7 @@ class Translator(object):
                     translatable, TRANSLATION_MISSING))
 
         if self.strategy == self.strategies.DEBUG_VALUE:
-            debug_value = self._get_debug_translation(translatable)
+            debug_value = self.strategy.get_debug_translation(translatable)
             if translatable.pending_value == debug_value:
                 return
 

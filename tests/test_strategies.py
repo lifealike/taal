@@ -102,7 +102,7 @@ class TestStrategies(object):
 
         translatable = TranslatableString(
             context=SAMPLE_CONTEXT, message_id=SAMPLE_MESSAGE_ID)
-        debug_value = translator._get_debug_translation(translatable)
+        debug_value = translator.strategy.get_debug_translation(translatable)
         translatable.pending_value = debug_value
 
         translator.save_translation(translatable)
