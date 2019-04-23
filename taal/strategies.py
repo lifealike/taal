@@ -5,7 +5,7 @@ from sqlalchemy.sql.expression import and_, or_
 from taal.translatablestring import TranslatableString
 
 
-TRANSLATION_MISSING = "<TranslationMissing sentinel>"
+TRANSLATION_MISSING = u"<TranslationMissing sentinel>"
 
 
 class Strategy(object):
@@ -66,14 +66,14 @@ class Strategy(object):
             self.session.query(self.model)
             .filter(self._language_filter())
             .filter(pk_filter)
+            .values(self.model.context,
+                    self.model.message_id,
+                    self.model.language,
+                    self.model.value)
         )
         cache = {
-            (
-                t.context.decode('utf8'),
-                t.message_id.decode('utf8'),
-                t.language.decode('utf8'),
-            ): t.value.decode('utf8')
-            for t in translations
+            (row[0], row[1], row[2]): row[3]
+            for row in translations
         }
         return cache
 
@@ -120,8 +120,9 @@ class SentinelStrategy(Strategy):
 class DebugStrategy(Strategy):
 
     def get_debug_translation(self, translatable):
-        return u"[Translation missing ({}, {}, {})]".format(
-            self.language, translatable.context, translatable.message_id)
+        return "[Translation missing ({}, {}, {})]".format(
+            self.language, translatable.context, translatable.message_id
+        ).decode('utf-8')
 
     def translation_missing(self, translatable):
         return self.get_debug_translation(translatable)

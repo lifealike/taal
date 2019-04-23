@@ -10,9 +10,9 @@ from taal.strategies import FallbackLangStrategy
 
 from tests.models import Translation
 
-SAMPLE_CONTEXT = 'context ಠ_ಠ'
-SAMPLE_MESSAGE_ID = 'message_id ಠ_ಠ'
-SAMPLE_LANGUAGE = 'language ಠ_ಠ'
+SAMPLE_CONTEXT = 'context ಠ_ಠ'.encode('utf-8')
+SAMPLE_MESSAGE_ID = 'message_id ಠ_ಠ'.encode('utf-8')
+SAMPLE_LANGUAGE = 'language ಠ_ಠ'.encode('utf-8')
 
 
 @pytest.mark.usefixtures('manager')
@@ -59,8 +59,8 @@ class TestStrategies(object):
         translation = Translation(
             context=SAMPLE_CONTEXT,
             message_id=SAMPLE_MESSAGE_ID,
-            language='en',
-            value='en fallback',
+            language='en'.encode('utf-8'),
+            value='en fallback ಠ_ಠ'.encode('utf-8'),
         )
         session.add(translation)
         session.commit()
@@ -76,7 +76,7 @@ class TestStrategies(object):
             context=SAMPLE_CONTEXT, message_id=SAMPLE_MESSAGE_ID)
 
         translation = translator.translate(translatable)
-        assert translation == 'en fallback'
+        assert translation == 'en fallback ಠ_ಠ'
 
     def test_override(self, session):
         translator = Translator(

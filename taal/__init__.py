@@ -95,10 +95,6 @@ class Translator(object):
         else:
             raise BindError("Unknown target {}".format(target))
 
-    def _get_debug_translation(self, translatable):
-        return u"[Translation missing ({}, {}, {})]".format(
-            self.language, translatable.context, translatable.message_id)
-
     def translate(self, translatable, strategy=None, cache=None):
         """
         Translate ``TranslatableString`` by looking up a translation
