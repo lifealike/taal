@@ -25,9 +25,9 @@ class Strategy(object):
                 (translatable.context, translatable.message_id, self.language)
             ]
         except KeyError:
-            return self.translation_missing(translatable, cache)
+            return self.translation_missing(self.language, translatable, cache)
 
-    def translation_missing(self, translatable, cache):
+    def translation_missing(self, language, translatable, cache):
         raise NotImplementedError
 
     def recursive_translate(self, translatable, cache=None):
@@ -116,25 +116,25 @@ class Strategy(object):
 
 class NoneStrategy(Strategy):
 
-    def translation_missing(self, translatable, cache):
+    def translation_missing(self, language, translatable, cache):
         return None
 
 
 class SentinelStrategy(Strategy):
 
-    def translation_missing(self, translatable, cache):
+    def translation_missing(self, language, translatable, cache):
         return TRANSLATION_MISSING
 
 
 class DebugStrategy(Strategy):
 
-    def get_debug_translation(self, translatable):
+    def get_debug_translation(self, language, translatable):
         return "[Translation missing ({}, {}, {})]".format(
-            self.language, translatable.context, translatable.message_id
+            language, translatable.context, translatable.message_id
         ).decode('utf-8')
 
-    def translation_missing(self, translatable, cache):
-        return self.get_debug_translation(translatable)
+    def translation_missing(self, language, translatable, cache):
+        return self.get_debug_translation(language, translatable)
 
 
 class FallbackLangStrategy(Strategy):
@@ -142,7 +142,7 @@ class FallbackLangStrategy(Strategy):
     def __init__(self, fallback_lang):
         self.fallback_lang = fallback_lang
 
-    def translation_missing(self, translatable, cache):
+    def translation_missing(self, language, translatable, cache):
         try:
             return cache[(
                 translatable.context,
